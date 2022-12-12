@@ -12,7 +12,7 @@ for i, line in enumerate(lines):
     for j, c in enumerate(line[:-1]):
         heightMap[i][j] = c
 
-# Part 1
+
 def findChar(c):
     global heightMapSize, heightMap
     for i in range(heightMapSize[0]):
@@ -35,7 +35,8 @@ def step(currentPos, nextStep, steps):
             > 1
             and heightMap[currentPos[0]][currentPos[1]] != "S"
         )
-        or numSteps[currentPos[0] + nextStep[0]][currentPos[1] + nextStep[1]] <= steps + 1
+        or numSteps[currentPos[0] + nextStep[0]][currentPos[1] + nextStep[1]]
+        <= steps + 1
         or (
             heightMap[currentPos[0] + nextStep[0]][currentPos[1] + nextStep[1]] == "E"
             and ord("z") - ord(heightMap[currentPos[0]][currentPos[1]]) > 1
@@ -51,15 +52,33 @@ def step(currentPos, nextStep, steps):
     step(newPos, (-1, 0), steps)
 
 
+# Part 1
 initialPos = findChar("S")
-numSteps = [[sys.maxsize for i in range(heightMapSize[1])] for j in range(heightMapSize[0])]
+numSteps = [
+    [sys.maxsize for i in range(heightMapSize[1])] for j in range(heightMapSize[0])
+]
 numSteps[initialPos[0]][initialPos[1]] = 0
 
 sys.setrecursionlimit(10000)
-step(initialPos, (0, 1), 0),
-step(initialPos, (1, 0), 0),
-step(initialPos, (0, -1), 0),
-step(initialPos, (-1, 0), 0),
+step(initialPos, (0, 1), 0)
+step(initialPos, (1, 0), 0)
+step(initialPos, (0, -1), 0)
+step(initialPos, (-1, 0), 0)
 
 endPos = findChar("E")
 print(numSteps[endPos[0]][endPos[1]])
+
+# Part 2
+minSteps = sys.maxsize
+for i in range(heightMapSize[0]):
+    for j in range(heightMapSize[1]):
+        if heightMap[i][j] == "S" or heightMap[i][j] == "a":
+            initialPos = [i, j]
+            numSteps[initialPos[0]][initialPos[1]] = 0
+            step(initialPos, (0, 1), 0)
+            step(initialPos, (1, 0), 0)
+            step(initialPos, (0, -1), 0)
+            step(initialPos, (-1, 0), 0)
+            minSteps = min(minSteps, numSteps[endPos[0]][endPos[1]])
+
+print(minSteps)
