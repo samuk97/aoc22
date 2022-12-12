@@ -1,7 +1,6 @@
 import sys
-import copy
 
-file = open("test.txt")
+file = open("input.txt")
 
 lines = file.readlines()
 
@@ -14,19 +13,16 @@ for i, line in enumerate(lines):
         heightMap[i][j] = c
 
 # Part 1
-def findStart():
+def findChar(c):
     global heightMapSize, heightMap
     for i in range(heightMapSize[0]):
         for j in range(heightMapSize[1]):
-            if heightMap[i][j] == "S":
+            if heightMap[i][j] == c:
                 return [i, j]
 
 
-def step(visited, currentPos, nextStep, numSteps):
-    global heightMapSize, heightMap
-    # Goal
-    if heightMap[currentPos[0]][currentPos[1]] == "E":
-        return numSteps
+def step(currentPos, nextStep, steps):
+    global heightMapSize, heightMap, numSteps
     # Invalid step
     if (
         currentPos[0] + nextStep[0] < 0
@@ -39,32 +35,31 @@ def step(visited, currentPos, nextStep, numSteps):
             > 1
             and heightMap[currentPos[0]][currentPos[1]] != "S"
         )
-        or visited[currentPos[0] + nextStep[0]][currentPos[1] + nextStep[1]] == 1
+        or numSteps[currentPos[0] + nextStep[0]][currentPos[1] + nextStep[1]] <= steps + 1
         or (
             heightMap[currentPos[0] + nextStep[0]][currentPos[1] + nextStep[1]] == "E"
             and ord("z") - ord(heightMap[currentPos[0]][currentPos[1]]) > 1
         )
     ):
-        return sys.maxsize
+        return
     newPos = [currentPos[0] + nextStep[0], currentPos[1] + nextStep[1]]
-    visited[newPos[0]][newPos[1]] = 1
-    numSteps += 1
-    return min(
-        step(copy.deepcopy(visited), newPos, (0, 1), numSteps),
-        step(copy.deepcopy(visited), newPos, (1, 0), numSteps),
-        step(copy.deepcopy(visited), newPos, (0, -1), numSteps),
-        step(copy.deepcopy(visited), newPos, (-1, 0), numSteps),
-    )
+    steps += 1
+    numSteps[newPos[0]][newPos[1]] = steps
+    step(newPos, (0, 1), steps)
+    step(newPos, (1, 0), steps)
+    step(newPos, (0, -1), steps)
+    step(newPos, (-1, 0), steps)
 
 
-initialPos = findStart()
-visited = [[0 for i in range(heightMapSize[1])] for j in range(heightMapSize[0])]
-visited[initialPos[0]][initialPos[1]] = 1
-print(
-    min(
-        step(copy.deepcopy(visited), initialPos, (0, 1), 0),
-        step(copy.deepcopy(visited), initialPos, (1, 0), 0),
-        step(copy.deepcopy(visited), initialPos, (0, -1), 0),
-        step(copy.deepcopy(visited), initialPos, (-1, 0), 0),
-    )
-)
+initialPos = findChar("S")
+numSteps = [[sys.maxsize for i in range(heightMapSize[1])] for j in range(heightMapSize[0])]
+numSteps[initialPos[0]][initialPos[1]] = 0
+
+sys.setrecursionlimit(10000)
+step(initialPos, (0, 1), 0),
+step(initialPos, (1, 0), 0),
+step(initialPos, (0, -1), 0),
+step(initialPos, (-1, 0), 0),
+
+endPos = findChar("E")
+print(numSteps[endPos[0]][endPos[1]])
