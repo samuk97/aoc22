@@ -1,4 +1,5 @@
 import sys
+import copy
 
 file = open("input.txt")
 
@@ -36,6 +37,7 @@ for line in lines:
     beaconPos.append(posB)
 
 
+# Part 1
 counter = 0
 rowOfInterest = 2000000
 y = rowOfInterest - minY
@@ -50,3 +52,37 @@ for x in range(maxX - minX):
             break
 
 print(counter)
+
+# Part 2
+sizeOfInterest = 4000000
+coordinatesOfInterest = []
+
+for s in sensors:
+    sPos = s[0]
+    distance = s[1]
+    coord = [sPos[0] - distance - 1, sPos[1]]
+    directions = [[1, -1], [1, 1], [-1, 1], [-1, -1]]
+    for dir in range(4):
+        for n in range(distance + 1):
+            if (
+                coord[0] + minY >= 0
+                and coord[1] + minX >= 0
+                and coord[0] + minY <= sizeOfInterest
+                and coord[1] + minX <= sizeOfInterest
+            ):
+                coordinatesOfInterest.append(copy.deepcopy(coord))
+            coord[0] += directions[dir][0]
+            coord[1] += directions[dir][1]
+
+for c in coordinatesOfInterest:
+    y = c[0]
+    x = c[1]
+    distressBeacon = True
+    for s in sensors:
+        distance = s[1]
+        if abs(y - s[0][0]) + abs(x - s[0][1]) <= distance:
+            distressBeacon = False
+    if distressBeacon:
+        print(x + minX, y + minY)
+        print((x + minX) * 4000000 + (y + minY))
+        exit()
