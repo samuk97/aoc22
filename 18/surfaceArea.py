@@ -22,20 +22,57 @@ for line in lines:
     line = line.split(",")
     droplet[int(line[2]), int(line[1]), int(line[0])] = 1.0
 
-def computeSurfaceArea():
+
+directions = [[-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, -1], [0, 0, 1]]
+
+
+def computeSurfaceArea(part):
     surfaceArea = 0
-    directions = [[-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, -1], [0, 0, 1]]
     for z in range(maxZ + 1):
         for y in range(maxY + 1):
             for x in range(maxX + 1):
                 if droplet[z, y, x] == 1.0:
                     for dir in directions:
                         try:
-                            if droplet[z + dir[2], y + dir[1], x + dir[0]] == 0.0:
+                            if (
+                                droplet[z + dir[2], y + dir[1], x + dir[0]] == 0.0
+                                or droplet[z + dir[2], y + dir[1], x + dir[0]] == -1.0
+                            ):
+                                if part == 2:
+                                    if (
+                                        droplet[z + dir[2], y + dir[1], x + dir[0]]
+                                        != -1.0
+                                    ):
+                                        continue
                                 surfaceArea += 1
                         except:
-                            surfaceArea += 1 
+                            surfaceArea += 1
     return surfaceArea
 
+
 # Part 1
-print(computeSurfaceArea())
+print(computeSurfaceArea(1))
+
+# Part 2
+def markNotTrapped():
+    changed = True
+    while changed:
+        changed = False
+        for z in range(maxZ + 1):
+            for y in range(maxY + 1):
+                for x in range(maxX + 1):
+                    if droplet[z, y, x] == 0.0:
+                        for dir in directions:
+                            try:
+                                if droplet[z + dir[2], y + dir[1], x + dir[0]] == -1.0:
+                                    droplet[z, y, x] = -1.0
+                                    changed = True
+                                    break
+                            except:
+                                droplet[z, y, x] = -1.0
+                                changed = True
+                                break
+
+
+markNotTrapped()
+print(computeSurfaceArea(2))
